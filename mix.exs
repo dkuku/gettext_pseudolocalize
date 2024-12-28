@@ -1,7 +1,7 @@
 defmodule GettextPseudolocalize.MixProject do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.1.1"
   @source_url "https://github.com/dkuku/gettext_pseudolocalize"
 
   def project do
@@ -44,17 +44,14 @@ defmodule GettextPseudolocalize.MixProject do
       name: "gettext_pseudolocalize",
       files: ~w(lib mix.exs README.md),
       licenses: ["Apache-2.0"],
-      links: %{
-        "GitHub" => @source_url,
-        "Changelog" => "#{@source_url}/blob/main/CHANGELOG.md"
-      }
+      links: %{"GitHub" => @source_url}
     ]
   end
 
   defp docs do
     [
       main: "readme",
-      extras: ["README.md", "CHANGELOG.md"],
+      extras: ["README.md"],
       source_url: @source_url,
       source_ref: "v#{@version}",
       formatters: ["html"]

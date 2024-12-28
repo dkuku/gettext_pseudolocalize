@@ -22,51 +22,47 @@ defmodule GettextPseudolocalize.Process do
   ## Examples
 
       iex> GettextPseudolocalize.Process.convert("Hello")
-      "⟦Ȟêĺĺø⟧"
+      "⟦Ȟêĺĺø~~~~~~~~~~⟧"
 
       iex> GettextPseudolocalize.Process.convert("Hello %{name}")
-      "⟦Ȟêĺĺø %{name}⟧"
+      "⟦Ȟêĺĺø %{name}~~~~~~⟧"
 
   """
   def convert(string) when is_binary(string) do
     string
     |> split_interpolations()
     |> Enum.map(&process_part/1)
-    |> Enum.join()
+    |> IO.iodata_to_binary()
     |> add_padding()
     |> wrap_brackets()
   end
 
   defp add_padding(string) do
     size = length(String.graphemes(string))
-    padding = if size > 10, do: trunc(Float.ceil(size * 1.4)), else: 15
+    padding = if size > 10, do: calculate_padding(size), else: 15
     String.pad_trailing(string, padding, "~")
   end
 
-  defp wrap_brackets(string) do
-    "⟦#{string}⟧"
-  end
+  defp calculate_padding(size), do: trunc(Float.ceil(size * 1.4))
+  defp wrap_brackets(string), do: "⟦#{string}⟧"
 
   # Split string into parts using recursive parsing
   defp split_interpolations(string), do: do_split_interpolations(string, [], "")
+  defp do_split_interpolations("", acc, current), do: Enum.reverse([current | acc])
 
-  defp do_split_interpolations("", acc, current) do
-    Enum.reverse(if current == "", do: acc, else: [current | acc])
-  end
-
-  defp do_split_interpolations("%" <> "{" <> rest, acc, current) do
-    acc = if current == "", do: acc, else: [current | acc]
+  defp do_split_interpolations("%{" <> rest, acc, current) do
+    acc = [current | acc]
     {var, rest} = extract_variable(rest)
-    do_split_interpolations(rest, ["%{" <> var <> "}" | acc], "")
+    var = IO.iodata_to_binary(["%{", var, "}"])
+
+    do_split_interpolations(rest, [var | acc], "")
   end
 
-  defp do_split_interpolations(<<c::utf8, rest::binary>>, acc, current) do
-    do_split_interpolations(rest, acc, current <> <<c::utf8>>)
-  end
+  defp do_split_interpolations(<<c::utf8, rest::binary>>, acc, current),
+    do: do_split_interpolations(rest, acc, current <> <<c::utf8>>)
 
   defp extract_variable(str), do: do_extract_variable(str, [])
-
-  defp do_extract_variable("}" <> rest, acc), do: {Enum.reverse(acc) |> to_string(), rest}
+  defp do_extract_variable("}" <> rest, acc), do: {Enum.reverse(acc), rest}
 
   defp do_extract_variable(<<c::utf8, rest::binary>>, acc),
     do: do_extract_variable(rest, [<<c::utf8>> | acc])
@@ -144,6 +140,5 @@ defmodule GettextPseudolocalize.Process do
   defp expand_characters(string) do
     String.graphemes(string)
     |> Enum.map(fn char -> Map.get(@char_map, char, char) end)
-    |> Enum.join()
   end
 end

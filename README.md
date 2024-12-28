@@ -1,6 +1,10 @@
 # Gettext Pseudolocalize
 
-A Mix task for pseudolocalizing Gettext translations in Elixir applications. Pseudolocalization is a software testing method used to verify internationalization aspects of software by replacing ordinary characters with accented or modified versions while maintaining readability.
+A Mix task for pseudolocalizing Gettext translations in Elixir
+applications. Pseudolocalization is a software testing method used to
+verify internationalization aspects of software by replacing ordinary
+characters with accented or modified versions while maintaining
+readability.
 
 ## Features
 
@@ -30,7 +34,8 @@ end
 mix gettext.extract
 ```
 
-2. Merge them into the xx locale:
+2. Merge them into the xx locale - this is done automatically by the
+gettext_pseudolocalize task:
 
 ```bash
 mix gettext.merge priv/gettext --locale=xx
@@ -42,7 +47,8 @@ mix gettext.merge priv/gettext --locale=xx
 mix gettext.pseudolocalize
 ```
 
-This will process all .po files in your xx locale directory (`priv/gettext/xx/LC_MESSAGES/`).
+This will process all .po files in your xx locale directory
+(`priv/gettext/xx/LC_MESSAGES/`).
 
 ### Example
 
@@ -55,7 +61,7 @@ msgstr ""
 After pseudolocalization in xx locale:
 ```
 msgid "Hello %{name}"
-msgstr "⟦Ĥéłłô %{name}⟧"
+msgstr "⟦Ȟêĺĺø %{name}~~~~~~⟧"
 ```
 
 ## Benefits
@@ -77,4 +83,4 @@ Pseudolocalization helps identify:
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the Apache-2.0 License.
