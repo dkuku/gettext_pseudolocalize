@@ -53,7 +53,7 @@ defmodule GettextPseudolocalize.Process do
   defp do_split_interpolations("%{" <> rest, acc, current) do
     acc = [current | acc]
     {var, rest} = extract_variable(rest)
-    var = IO.iodata_to_binary(["%{", var, "}"])
+    var = IO.iodata_to_binary(["%{", var])
 
     do_split_interpolations(rest, [var | acc], "")
   end
@@ -62,7 +62,8 @@ defmodule GettextPseudolocalize.Process do
     do: do_split_interpolations(rest, acc, current <> <<c::utf8>>)
 
   defp extract_variable(str), do: do_extract_variable(str, [])
-  defp do_extract_variable("}" <> rest, acc), do: {Enum.reverse(acc), rest}
+  defp do_extract_variable("}" <> rest, acc), do: {Enum.reverse(["}" | acc]), rest}
+  defp do_extract_variable("", acc), do: {Enum.reverse(acc), ""}
 
   defp do_extract_variable(<<c::utf8, rest::binary>>, acc),
     do: do_extract_variable(rest, [<<c::utf8>> | acc])

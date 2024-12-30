@@ -47,5 +47,19 @@ defmodule GettextPseudolocalize.ProcessTest do
       assert String.ends_with?(result, "⟧")
       assert String.starts_with?(result, "⟦")
     end
+
+    test "just interpolation" do
+      result = Process.convert("%{name}")
+      assert result =~ "%{name}~~~~~~~~"
+      assert String.ends_with?(result, "⟧")
+      assert String.starts_with?(result, "⟦")
+    end
+
+    test "invalid interpolation" do
+      result = Process.convert("Hello %{name, welcome!")
+      assert result =~ " %{name, welcome!"
+      assert String.ends_with?(result, "⟧")
+      assert String.starts_with?(result, "⟦")
+    end
   end
 end
